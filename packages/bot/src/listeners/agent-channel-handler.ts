@@ -2,10 +2,15 @@ import {
   type Client,
   Events,
   type Message,
-  type TextBasedChannel
+  type TextBasedChannel,
+  type ThreadChannel
 } from 'discord.js';
 
-import { runAgentChat, type AgentChatMessage } from '../utils/agent-client';
+import {
+  runAgentChat,
+  type AgentChatMessage,
+  type AgentContext
+} from '../utils/agent-client';
 
 const CONTEXT_MESSAGE_LIMIT = 20;
 
@@ -22,7 +27,7 @@ export function registerAgentChannelHandler(client: Client): void {
         return;
       }
 
-      const reply = await runAgentChat(conversation);
+      const reply = await runAgentChat(conversation, buildAgentContext(message));
 
       await message.reply({
         content: reply,
@@ -86,6 +91,26 @@ async function buildConversationHistory(message: Message): Promise<AgentChatMess
   return conversation;
 }
 
+function buildAgentContext(message: Message): AgentContext {
+  const now = new Date();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC';
+  const localTime = now.toLocaleString('en-US', {
+    timeZone: timezone,
+    dateStyle: 'full',
+    timeStyle: 'long'
+  });
+
+  return {
+    isoTimestamp: now.toISOString(),
+    timezone,
+    localTime,
+    guildName: message.guild?.name,
+    channelName: resolveChannelName(message.channel as TextBasedChannel),
+    triggeredBy: getDisplayName(message),
+    botDisplayName: message.guild?.members.me?.displayName ?? message.client.user?.username
+  };
+}
+
 function formatMessageContent(message: Message, botUsername: string, botDisplayName?: string | null): string {
   const mentionLabels = new Set<string>();
   mentionLabels.add(`@${botUsername}`);
@@ -112,6 +137,21 @@ function formatMessageContent(message: Message, botUsername: string, botDisplayN
 
 function getDisplayName(message: Message): string {
   return message.member?.displayName ?? message.author.globalName ?? message.author.username;
+}
+
+function resolveChannelName(channel: TextBasedChannel): string {
+  const threadChannel = channel as ThreadChannel;
+  if (typeof threadChannel.isThread === 'function' && threadChannel.isThread()) {
+    const parentName = threadChannel.parent?.name;
+    return parentName ? `${parentName} › ${threadChannel.name}` : threadChannel.name;
+  }
+
+  const namedChannel = channel as { name?: string | null };
+  if (namedChannel.name) {
+    return namedChannel.name;
+  }
+
+  return channel.id;
 }
 
 async function safeReply(message: Message, content: string): Promise<void> {

@@ -3,7 +3,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/chat/completio
 
 import { env } from '../config/env';
 
-const SYSTEM_PROMPT = `You are a channel-aware assistant embedded directly inside Discord. Answer concisely (2-4 sentences), never prepend role labels, and rely solely on the provided channel history. If the request does not mention you directly, do not respond.`;
+const BASE_SYSTEM_PROMPT = `You are a channel-aware assistant embedded directly inside Discord. Answer thoroughly yet succinctly, never prepend role labels, and rely on the provided channel history plus any metadata. If the conversation shows you were mentioned directly, respond in-channel; otherwise stay silent.`;
 
 const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY
@@ -11,14 +11,27 @@ const openai = new OpenAI({
 
 export type AgentChatMessage = Extract<ChatCompletionMessageParam, { role: 'user' | 'assistant' }>;
 
-export async function runAgentChat(messages: AgentChatMessage[]): Promise<string> {
+export type AgentContext = {
+  isoTimestamp: string;
+  timezone: string;
+  localTime: string;
+  guildName?: string;
+  channelName?: string;
+  triggeredBy?: string;
+  botDisplayName?: string;
+};
+
+export async function runAgentChat(
+  messages: AgentChatMessage[],
+  context?: AgentContext
+): Promise<string> {
   const completion = await openai.chat.completions.create({
     model: env.OPENAI_CHAT_MODEL,
     temperature: 0.3,
     messages: [
       {
         role: 'system',
-        content: SYSTEM_PROMPT
+        content: buildSystemPrompt(context)
       },
       ...messages
     ]
@@ -35,4 +48,21 @@ function trimForDiscord(content: string): string {
   }
 
   return `${content.slice(0, env.MAX_DISCORD_REPLY_CHARS - 1)}…`;
+}
+
+function buildSystemPrompt(context?: AgentContext): string {
+  if (!context) {
+    return BASE_SYSTEM_PROMPT;
+  }
+
+  const contextLines = [
+    `Current ISO timestamp: ${context.isoTimestamp}`,
+    `Local time (${context.timezone}): ${context.localTime}`,
+    context.guildName ? `Guild: ${context.guildName}` : undefined,
+    context.channelName ? `Channel: ${context.channelName}` : undefined,
+    context.triggeredBy ? `Mentioned by: ${context.triggeredBy}` : undefined,
+    context.botDisplayName ? `Assistant display name: ${context.botDisplayName}` : undefined
+  ].filter((line): line is string => typeof line === 'string');
+
+  return `${BASE_SYSTEM_PROMPT}\n\nContext metadata:\n${contextLines.join('\n')}\n\nWhen asked about the current date/time or channel, use the metadata above.`;
 }
