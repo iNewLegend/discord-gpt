@@ -8,6 +8,29 @@
 - `src/config/env.ts`: Zod-powered validation for `DISCORD_BOT_TOKEN`, `OPENAI_API_KEY`, optional `OPENAI_CHAT_MODEL`, and `MAX_DISCORD_REPLY_CHARS`, keeping the bot channel-agnostic.
 - `tests/`: Keep listener and helper specs mirrored to the source tree (e.g., `tests/listeners/agent-channel-handler.test.ts`).
 
+## Contribution Ground Rules
+- Never kill or build or start the server.
+- Each time you run a command, first run `pwd`.
+- Avoid hard coded values as much as possible.
+- Do exactly what is requested, nothing more.
+- SoC and SRP is the way to go; stay laser-focused on separation of concerns.
+- Use empty lines as logical separators instead of inline comments; comments are disallowed.
+- Never use `any` or `unknown`.
+- Always consult with the maintainer before editing code; never change files or create new ones without explicit permission, and verify an equivalent file with another extension does not already exist.
+- Never commit or push without permission.
+- Write better code.
+- Write better code.
+- Write better code.
+- Try to write simple and reliable code.
+- Do not overcomplicate or overdo the solution.
+- Always focus on the immediate request and keep implementations tight.
+- Follow:
+  - separation of concerns
+  - single responsibility principle
+  - composition over inheritance when inheritance is not possible
+  - design patterns
+  - agnostic naming that reflects purpose rather than implementation details
+
 ## Build, Test, and Development Commands
 - `bun install` — install workspace dependencies (set `BUN_INSTALL_CACHE_DIR=$PWD/.bun-cache` if temp access is restricted).
 - `bun dev` / `bun start` — run the Discord bot (both target `packages/bot/src/index.ts`).
