@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 - `.cursor/rules/`: Repo-specific automation/convention rules. Read these before contributing to ensure Bun-first workflows and coding expectations stay consistent.
-- `CHANGELOG.md`: Update this file with every merged change (keep entries grouped by release heading and date).
+- `CHANGELOG.md`: Update this file with every merged change; start the entry with a `# YYYY-MM-DD` heading for the current date and omit version numbers.
 - `packages/bot/`: Discord bot entry point. Core listener lives in `src/listeners/agent-channel-handler.ts`, which subscribes to `messageCreate`, filters out bots, enforces mention-only triggers, and gathers the latest ~20 channel messages for context.
 - `src/utils/agent-client.ts`: Shared OpenAI helper reused by listeners; handles client setup, output trimming, and prompt scaffolding.
 - `src/config/env.ts`: Zod-powered validation for `DISCORD_BOT_TOKEN`, `OPENAI_API_KEY`, optional `OPENAI_CHAT_MODEL`, and `MAX_DISCORD_REPLY_CHARS`, keeping the bot channel-agnostic.

@@ -1,6 +1,5 @@
-# Changelog
+# 2025-11-10
 
-## [0.1.0] - 2025-11-10
 ### Added
 - Initial Bun-based channel-aware Discord bot bootstrap.
 - OpenAI helper, env validation, and mention-triggered listener.
