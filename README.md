@@ -33,10 +33,17 @@ The Bun runtime automatically loads `.env` files; no extra config is needed.
 1. `packages/bot/src/index.ts` boots a `discord.js` client with the required intents.
 2. `src/listeners/agent-channel-handler.ts` watches `messageCreate`, ignores bots, requires a direct mention, fetches ~20 recent messages, and shapes the chat history (`DisplayName: message`).
 3. `src/utils/agent-client.ts` wraps the OpenAI client, adds the concise-response system prompt, trims long completions, and now exposes OpenAI tool-calling so the assistant can request privileged actions.
-4. `src/tools/` registers server-side tools (starting with `clear_channel_messages` and `describe_channel`) that run permission checks and perform actions such as clearing recent messages or summarizing channel/member metadata when the model asks.
+4. `src/tools/` registers server-side tools (e.g., `clear_channel_messages`, `describe_channel`, `send_file`, `run_command`, `search_internet`) that run permission checks and perform actions such as clearing recent messages, summarizing channel/member metadata, sharing files, executing commands, or pulling fresh information.
 
 ### Available Tools
 - `clear_channel_messages` – Bulk deletes up to 50 recent, unpinned messages (14-day Discord limit) when both the moderator and bot have `ManageMessages`. Posts a confirmation message in-channel after completion.
 - `describe_channel` – Returns JSON-formatted metadata (name, topic, type, rate limits, parent, creation timestamp) and can list up to 25 member display names currently in the channel.
+- `send_file` – Streams a local file (≤25 MB) plus an optional message into the channel after validating paths and sizes.
+- `run_command` – Executes a shell command with configurable timeout (1–60 s) and returns exit code, stdout, and stderr as structured JSON.
+- `search_internet` – Uses DuckDuckGo HTML results to provide current information when the model needs out-of-band data.
+
+### Response Style
+- Every assistant reply is prefixed with the word `thinking` to indicate the bot is reasoning in-channel before delivering the final message.
+- Typing indicators stay active while tools run so users know the operation is still in progress.
 
 Errors are surfaced back into the channel with mentions disabled so no one is accidentally pinged.
