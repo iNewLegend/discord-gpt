@@ -33,6 +33,10 @@ The Bun runtime automatically loads `.env` files; no extra config is needed.
 1. `packages/bot/src/index.ts` boots a `discord.js` client with the required intents.
 2. `src/listeners/agent-channel-handler.ts` watches `messageCreate`, ignores bots, requires a direct mention, fetches ~20 recent messages, and shapes the chat history (`DisplayName: message`).
 3. `src/utils/agent-client.ts` wraps the OpenAI client, adds the concise-response system prompt, trims long completions, and now exposes OpenAI tool-calling so the assistant can request privileged actions.
-4. `src/tools/` registers server-side tools (starting with `clear_channel_messages`) that run permission checks and perform actions such as clearing recent messages when the model asks for them.
+4. `src/tools/` registers server-side tools (starting with `clear_channel_messages` and `describe_channel`) that run permission checks and perform actions such as clearing recent messages or summarizing channel/member metadata when the model asks.
+
+### Available Tools
+- `clear_channel_messages` – Bulk deletes up to 50 recent, unpinned messages (14-day Discord limit) when both the moderator and bot have `ManageMessages`. Posts a confirmation message in-channel after completion.
+- `describe_channel` – Returns JSON-formatted metadata (name, topic, type, rate limits, parent, creation timestamp) and can list up to 25 member display names currently in the channel.
 
 Errors are surfaced back into the channel with mentions disabled so no one is accidentally pinged.

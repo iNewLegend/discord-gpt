@@ -1,7 +1,6 @@
 import { Events    } from "discord.js";
 
 import { buildToolset } from "@discord-gpt/bot/src/tools";
-
 import { runAgentChat   } from "@discord-gpt/bot/src/utils/agent-client";
 
 import type { Message, TextBasedChannel, ThreadChannel , Client } from "discord.js";
@@ -22,11 +21,9 @@ export function registerAgentChannelHandler( client: Client ): void {
                 return;
             }
 
-            const toolset = buildToolset( message );
-
             const reply = await runAgentChat( conversation, {
                 context: buildAgentContext( message ),
-                toolset
+                toolset: buildToolset( message )
             } );
 
             await message.reply( {
@@ -50,13 +47,11 @@ function shouldHandleMessage( message: Message ): boolean {
     const botUser = message.client.user;
     if ( !botUser ) return false;
 
-    const mentioned = message.mentions.has( botUser, {
+    return message.mentions.has( botUser, {
         ignoreEveryone: true,
         ignoreRoles: true,
         ignoreRepliedUser: true
     } );
-
-    return mentioned;
 }
 
 async function buildConversationHistory( message: Message ): Promise<AgentChatMessage[]> {
@@ -71,11 +66,7 @@ async function buildConversationHistory( message: Message ): Promise<AgentChatMe
     const conversation: AgentChatMessage[] = [];
 
     for ( const msg of sorted ) {
-        const content = formatMessageContent(
-            msg,
-            botUser.username,
-            msg.guild?.members.me?.displayName
-        );
+        const content = formatMessageContent( msg, botUser.username, msg.guild?.members.me?.displayName );
         if ( !content ) continue;
 
         if ( msg.author.id === botUser.id ) {

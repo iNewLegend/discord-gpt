@@ -6,7 +6,7 @@
 - `packages/bot/`: Discord bot entry point. Core listener lives in `src/listeners/agent-channel-handler.ts`, which subscribes to `messageCreate`, filters out bots, enforces mention-only triggers, and gathers the latest ~20 channel messages for context.
 - `src/utils/agent-client.ts`: Shared OpenAI helper reused by listeners; handles client setup, output trimming, and prompt scaffolding.
 - `src/config/env.ts`: Zod-powered validation for `DISCORD_BOT_TOKEN`, `OPENAI_API_KEY`, optional `OPENAI_CHAT_MODEL`, and `MAX_DISCORD_REPLY_CHARS`, keeping the bot channel-agnostic.
-- `src/tools/`: Tool registry and implementations (e.g., `clear_channel_messages`) that the agent can invoke when the model requests privileged actions.
+- `src/tools/`: Tool registry and implementations (e.g., `clear_channel_messages`, `channel-insights`) that the agent can invoke when the model requests privileged actions.
 - `tests/`: Keep listener and helper specs mirrored to the source tree (e.g., `tests/listeners/agent-channel-handler.test.ts`).
 
 ## Contribution Ground Rules
@@ -36,7 +36,7 @@
 - `bun install` — install workspace dependencies (set `BUN_INSTALL_CACHE_DIR=$PWD/.bun-cache` if temp access is restricted).
 - `bun dev` / `bun start` — run the Discord bot (both target `packages/bot/src/index.ts`).
 - `bun run lint` — run ESLint (mirrors the lint GitHub Action flow).
-- `bun run typecheck` — strict TypeScript type-check; run before commits touching listeners/helpers.
+- `bun run typecheck` — strict TypeScript type-check; run before commits touching listeners/helpers (mirrors the typecheck GitHub Action).
 - `bun test` — execute Bun/Vitest-style specs (add `--watch` during development once tests exist).
 
 ## Coding Style & Naming Conventions
@@ -44,6 +44,7 @@
 - 2-space indentation, single quotes, and trailing commas per prettier defaults.
 - Listener files follow `*-handler.ts`; helpers use descriptive verbs (e.g., `runAgentChat`).
 - Exported enums/interfaces are PascalCase; internal variables are camelCase; constants that mirror env vars remain UPPER_SNAKE_CASE.
+- ESLint enforces Bun workspace rules: no tabs (spaces only), type-only imports for symbols used purely as types, consistent specifier style, and no unused bindings.
 
 ## Testing Guidelines
 - Use Vitest/Jest-style `describe`/`it` blocks; file names should mirror sources: `agent-channel-handler.test.ts`.
