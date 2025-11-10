@@ -22,6 +22,8 @@ export function registerAgentChannelHandler( client: Client ): void {
             }
 
             const channel = message.channel as TextBasedChannel;
+            const messageId = message.id;
+
             await channel.sendTyping();
 
             const reply = await runAgentChat( conversation, {
@@ -29,10 +31,18 @@ export function registerAgentChannelHandler( client: Client ): void {
                 toolset: buildToolset( message )
             } );
 
-            await message.reply( {
-                content: reply,
-                allowedMentions: { parse: [] }
-            } );
+            try {
+                const originalMessage = await channel.messages.fetch( messageId );
+                await originalMessage.reply( {
+                    content: reply,
+                    allowedMentions: { parse: [] }
+                } );
+            } catch {
+                await channel.send( {
+                    content: reply,
+                    allowedMentions: { parse: [] }
+                } );
+            }
         } catch ( error ) {
             console.error( "[agent-channel-handler] Failed to respond to mention", error );
 
@@ -151,10 +161,20 @@ function resolveChannelName( channel: TextBasedChannel ): string {
 async function safeReply( message: Message, content: string ): Promise<void> {
     if ( !message.channel.isSendable() ) return;
 
-    await message.reply( {
-        content,
-        allowedMentions: { parse: [] }
-    } );
+    const channel = message.channel as TextBasedChannel;
+
+    try {
+        const originalMessage = await channel.messages.fetch( message.id );
+        await originalMessage.reply( {
+            content,
+            allowedMentions: { parse: [] }
+        } );
+    } catch {
+        await channel.send( {
+            content,
+            allowedMentions: { parse: [] }
+        } );
+    }
 }
 
 function escapeRegex( value: string ): string {

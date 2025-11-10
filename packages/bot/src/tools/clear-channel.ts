@@ -50,9 +50,13 @@ export const clearChannelTool: AgentTool = {
     },
     execute: async ( context: ToolExecutionContext ) => {
         if ( !isGuildTextChannel( context.channel ) ) {
+            const errorPayload: JsonObject = {
+                error: "Channel does not support bulk deletion."
+            };
+
             return {
                 status: "error",
-                message: "Channel does not support bulk deletion."
+                message: JSON.stringify( errorPayload )
             };
         }
 
@@ -61,19 +65,24 @@ export const clearChannelTool: AgentTool = {
             const deletable = fetched.filter( ( msg ) => !msg.pinned && !msg.system );
             const deleted = await context.channel.bulkDelete( deletable, true );
 
-            await context.channel.send( {
-                content: `Cleared ${ deleted.size } messages as requested by ${ context.message.author.username }.`,
-                allowedMentions: { parse: [] }
-            } );
+            const payload: JsonObject = {
+                deletedCount: deleted.size,
+                requestedBy: context.message.author.username,
+                requestedByDisplayName: context.message.member?.displayName ?? context.message.author.globalName ?? context.message.author.username
+            };
 
             return {
                 status: "success",
-                message: `Deleted ${ deleted.size } messages at ${ context.message.author.username }'s request.`
+                message: JSON.stringify( payload )
             };
         } catch {
+            const errorPayload: JsonObject = {
+                error: "Failed to clear messages. Ensure they are newer than fourteen days."
+            };
+
             return {
                 status: "error",
-                message: "Failed to clear messages. Ensure they are newer than fourteen days."
+                message: JSON.stringify( errorPayload )
             };
         }
     }
