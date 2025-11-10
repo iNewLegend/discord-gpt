@@ -38,9 +38,11 @@ The Bun runtime automatically loads `.env` files; no extra config is needed.
 ### Available Tools
 - `clear_channel_messages` – Bulk deletes up to 50 recent, unpinned messages (14-day Discord limit) when both the moderator and bot have `ManageMessages`. Posts a confirmation message in-channel after completion.
 - `describe_channel` – Returns JSON-formatted metadata (name, topic, type, rate limits, parent, creation timestamp) and can list up to 25 member display names currently in the channel.
+- `list_directory` – Lists directories/files (with size + type metadata) after expanding `~` paths so the agent can inspect the filesystem safely.
 - `send_file` – Streams a local file (≤25 MB) plus an optional message into the channel after validating paths and sizes.
 - `run_command` – Executes a shell command with configurable timeout (1–60 s) and returns exit code, stdout, and stderr as structured JSON.
 - `search_internet` – Uses DuckDuckGo HTML results to provide current information when the model needs out-of-band data.
+- `fetch_url` – Pulls text-based web content (HTML, JSON, XML, JS) with timeout and length limits so the agent can quote or summarize external pages safely.
 
 ### Response Style
 - Every assistant reply is prefixed with the word `thinking` to indicate the bot is reasoning in-channel before delivering the final message.

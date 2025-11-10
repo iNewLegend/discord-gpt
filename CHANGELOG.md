@@ -4,6 +4,8 @@
 - `send_file` tool shares local files (with size/path validation) straight into the channel when the model needs to deliver artifacts.
 - `run_command` tool executes shell commands with timeout enforcement and streams stdout/stderr back into the reply payloads.
 - `search_internet` tool performs DuckDuckGo lookups so the agent can cite up-to-date information.
+- `list_directory` tool inspects filesystem directories (with `~` expansion) so the agent can explore before running commands or sharing files.
+- `fetch_url` tool fetches text-based web content with timeout/content-type safeguards so the agent can quote or summarize external pages on demand.
 - Typing indicator and tool completion confirmations to show users when the bot is working or has finished tasks.
 
 ### Changed
