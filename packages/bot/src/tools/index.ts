@@ -2,12 +2,13 @@ import { clearChannelTool } from "@discord-gpt/bot/src/tools/clear-channel";
 import { channelInsightsTool } from "@discord-gpt/bot/src/tools/channel-insights";
 import { internetSearchTool } from "@discord-gpt/bot/src/tools/internet-search";
 import { runCommandTool } from "@discord-gpt/bot/src/tools/run-command";
+import { sendFileTool } from "@discord-gpt/bot/src/tools/send-file";
 
 import type { Message } from "discord.js";
 
 import type { Toolset } from "@discord-gpt/bot/src/tools/types";
 
-const registeredTools = [ clearChannelTool, channelInsightsTool, internetSearchTool, runCommandTool ];
+const registeredTools = [ clearChannelTool, channelInsightsTool, internetSearchTool, runCommandTool, sendFileTool ];
 
 export function buildToolset( message: Message ): Toolset | undefined {
     if ( !message.channel.isTextBased() ) {
