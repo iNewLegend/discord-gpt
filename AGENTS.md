@@ -53,6 +53,52 @@
 - Each PR must describe scope, mention related issue IDs, list validation commands run, and include screenshots or logs for user-visible behavior.
 - Ensure `bun run typecheck && bun test` pass before requesting review; attach relevant `.env.sample` updates if new configuration is introduced.
 
+## Cursor Rules for Commit Messages
+When generating commit messages, follow this exact format:
+
+### Format Template
+```
+Tag1: (`Tag2`) - Tag3
+```
+
+### Tag1 Categories (Required)
+- `feat` — New feature or functionality
+- `fix` — Bug fix or issue resolution
+- `chore` — Maintenance tasks, dependencies, or tooling
+- `infra` — Infrastructure changes, CI/CD, deployment
+- `tweak` — Minor improvements, refactoring, or adjustments
+
+### Tag2 — Package/Area (Required)
+- `website` — Frontend website application
+- `docs` — Documentation site
+- `shared` — Shared utilities or components
+- `config` — Configuration files
+- `scripts` — Build or deployment scripts
+- `root` — Root-level changes affecting the entire workspace
+
+### Tag3 — Description (Required)
+- Use present tense ("Add feature" not "Added feature")
+- Be specific about the change and its intent
+- Keep it under 50 characters when possible
+- Use lowercase except for proper nouns
+
+### Examples
+```
+feat: (`website`) - add resume section reordering functionality
+fix: (`docs`) - resolve broken internal links in api documentation
+chore: (`shared`) - update typescript dependencies to latest versions
+infra: (`root`) - configure automated deployment pipeline
+tweak: (`website`) - improve resume component naming consistency
+```
+
+### Instructions
+1. Analyze the changes to understand scope.
+2. Select the correct Tag1 category.
+3. Identify the affected package/area for Tag2.
+4. Summarize the change for Tag3.
+5. Follow the exact `Tag1: (`Tag2`) - Tag3` syntax.
+6. Keep messaging consistent across commits and provide only the formatted line with no extra commentary.
+
 ## Security & Configuration Tips
 - Never log raw API keys or bot tokens. Use redact helpers when debugging.
 - Limit intents to `Guilds`, `GuildMessages`, and `MessageContent`; disable unused ones to minimize attack surface and honor Discord policies.
