@@ -44,7 +44,7 @@ export async function runAgentChat(
     const conversation: ChatCompletionMessageParam[] = [
         {
             role: "system",
-            content: buildSystemPrompt( options?.context )
+            content: buildSystemPrompt( options?.context, options?.toolset )
         },
         ...messages
     ];
@@ -170,19 +170,26 @@ function trimForDiscord( content: string ): string {
     return `${ content.slice( 0, env.MAX_DISCORD_REPLY_CHARS - 1 ) }…`;
 }
 
-function buildSystemPrompt( context?: AgentContext ): string {
-    if ( !context ) {
-        return BASE_SYSTEM_PROMPT;
+function buildSystemPrompt( context?: AgentContext, toolset?: Toolset ): string {
+    let prompt = BASE_SYSTEM_PROMPT;
+
+    if ( context ) {
+        const contextLines = [
+            `Current ISO timestamp: ${ context.isoTimestamp }`,
+            `Local time (${ context.timezone }): ${ context.localTime }`,
+            context.guildName ? `Guild: ${ context.guildName }` : undefined,
+            context.channelName ? `Channel: ${ context.channelName }` : undefined,
+            context.triggeredBy ? `Mentioned by: ${ context.triggeredBy }` : undefined,
+            context.botDisplayName ? `Assistant display name: ${ context.botDisplayName }` : undefined
+        ].filter( ( line ): line is string => typeof line === "string" );
+
+        prompt += `\n\nContext metadata:\n${ contextLines.join( "\n" ) }\n\nWhen asked about the current date/time or channel, use the metadata above.`;
     }
 
-    const contextLines = [
-        `Current ISO timestamp: ${ context.isoTimestamp }`,
-        `Local time (${ context.timezone }): ${ context.localTime }`,
-        context.guildName ? `Guild: ${ context.guildName }` : undefined,
-        context.channelName ? `Channel: ${ context.channelName }` : undefined,
-        context.triggeredBy ? `Mentioned by: ${ context.triggeredBy }` : undefined,
-        context.botDisplayName ? `Assistant display name: ${ context.botDisplayName }` : undefined
-    ].filter( ( line ): line is string => typeof line === "string" );
+    if ( toolset && toolset.tools.length > 0 ) {
+        const toolDescriptions = toolset.tools.map( ( tool ) => `- ${ tool.name }: ${ tool.description }` );
+        prompt += `\n\nAvailable tools:\n${ toolDescriptions.join( "\n" ) }\n\nUse these tools when appropriate to fulfill user requests.`;
+    }
 
-    return `${ BASE_SYSTEM_PROMPT }\n\nContext metadata:\n${ contextLines.join( "\n" ) }\n\nWhen asked about the current date/time or channel, use the metadata above.`;
+    return prompt;
 }
