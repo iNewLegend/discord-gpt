@@ -1,11 +1,12 @@
 import { clearChannelTool } from "@discord-gpt/bot/src/tools/clear-channel";
 import { channelInsightsTool } from "@discord-gpt/bot/src/tools/channel-insights";
+import { internetSearchTool } from "@discord-gpt/bot/src/tools/internet-search";
 
 import type { Message } from "discord.js";
 
 import type { Toolset } from "@discord-gpt/bot/src/tools/types";
 
-const registeredTools = [ clearChannelTool, channelInsightsTool ];
+const registeredTools = [ clearChannelTool, channelInsightsTool, internetSearchTool ];
 
 export function buildToolset( message: Message ): Toolset | undefined {
     if ( !message.channel.isTextBased() ) {
