@@ -21,6 +21,9 @@ export function registerAgentChannelHandler( client: Client ): void {
                 return;
             }
 
+            const channel = message.channel as TextBasedChannel;
+            await channel.sendTyping();
+
             const reply = await runAgentChat( conversation, {
                 context: buildAgentContext( message ),
                 toolset: buildToolset( message )
