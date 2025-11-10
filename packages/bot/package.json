@@ -1,0 +1,9 @@
+{
+    "name": "@discord-gpt/bot",
+    "exports": {
+        "./package.json": "./package.json",
+        "./src/*": [
+            "./src/*.ts"
+        ]
+    }
+}

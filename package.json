@@ -3,9 +3,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run packages/bot/src/index.ts",
-    "start": "bun run packages/bot/src/index.ts",
-    "typecheck": "bunx tsc --noEmit",
+    "dev": "bun --bun run packages/bot/src/index.ts",
+    "typecheck": "bun --bun run tsc --noEmit",
+    "lint": "bun --bun run eslint .",
+    "lint:fix": "bun --bun run eslint --fix .",
     "test": "bun test"
   },
   "workspaces": [
@@ -20,6 +21,7 @@
     "@types/bun": "latest",
     "@types/node": "^20.11.3",
     "@zenflux/eslint": "^0.1.18",
+    "eslint": "^9.39.1",
     "typescript": "^5.5.4"
   }
 }

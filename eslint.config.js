@@ -8,6 +8,7 @@ const config = [
             "**/eslint.config.*",
             "**/*jest.config.ts",
             "**/vite.config.*",
+            ".bun-cache",
             "**/*.cjs"
         ],
     },
