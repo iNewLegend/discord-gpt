@@ -4,6 +4,9 @@
         "./package.json": "./package.json",
         "./src/*": [
             "./src/*.ts"
+        ],
+        "./src/tools": [
+            "./src/tools/index.ts"
         ]
     }
 }

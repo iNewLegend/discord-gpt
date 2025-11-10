@@ -1,16 +1,10 @@
-import {
+import { Events    } from "discord.js";
 
-    Events
+import { buildToolset } from "@discord-gpt/bot/src/tools";
 
-} from "discord.js";
+import { runAgentChat   } from "@discord-gpt/bot/src/utils/agent-client";
 
-import {
-    runAgentChat
-
-} from "@discord-gpt/bot/src/utils/agent-client";
-
-import type { Client, Message, TextBasedChannel, ThreadChannel } from "discord.js";
-
+import type { Message, TextBasedChannel, ThreadChannel , Client } from "discord.js";
 import type { AgentChatMessage, AgentContext } from "@discord-gpt/bot/src/utils/agent-client";
 
 const CONTEXT_MESSAGE_LIMIT = 20;
@@ -28,7 +22,12 @@ export function registerAgentChannelHandler( client: Client ): void {
                 return;
             }
 
-            const reply = await runAgentChat( conversation, buildAgentContext( message ) );
+            const toolset = buildToolset( message );
+
+            const reply = await runAgentChat( conversation, {
+                context: buildAgentContext( message ),
+                toolset
+            } );
 
             await message.reply( {
                 content: reply,

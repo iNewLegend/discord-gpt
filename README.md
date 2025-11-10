@@ -25,12 +25,14 @@ The Bun runtime automatically loads `.env` files; no extra config is needed.
 
 ## Commands
 - `bun dev` / `bun start` – boots the Discord client and registers the channel-aware listener.
+- `bun run lint` – runs ESLint across the workspace (mirrors the GitHub Actions lint workflow).
 - `bun test` – placeholder for future listener/unit tests (Vitest or Bun test runner).
 - `bun run typecheck` – strict TypeScript validation (recommended before pushing changes).
 
 ## How It Works
 1. `packages/bot/src/index.ts` boots a `discord.js` client with the required intents.
 2. `src/listeners/agent-channel-handler.ts` watches `messageCreate`, ignores bots, requires a direct mention, fetches ~20 recent messages, and shapes the chat history (`DisplayName: message`).
-3. `src/utils/agent-client.ts` wraps the OpenAI client, adds the concise-response system prompt, and trims long completions to fit Discord character limits.
+3. `src/utils/agent-client.ts` wraps the OpenAI client, adds the concise-response system prompt, trims long completions, and now exposes OpenAI tool-calling so the assistant can request privileged actions.
+4. `src/tools/` registers server-side tools (starting with `clear_channel_messages`) that run permission checks and perform actions such as clearing recent messages when the model asks for them.
 
 Errors are surfaced back into the channel with mentions disabled so no one is accidentally pinged.
